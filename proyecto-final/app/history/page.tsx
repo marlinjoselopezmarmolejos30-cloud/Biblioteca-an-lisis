@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
-import { DocumentCard } from "@/components/document-card"
+import { DocumentCard } from "@/components/documents/document-card"
 import { History } from "lucide-react"
 
 export const metadata = {
@@ -56,7 +56,7 @@ export default async function HistoryPage() {
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {documents.map((doc) => (
-            <DocumentCard key={doc.id} document={doc} showProgress />
+            <DocumentCard key={doc.id} document={doc} />
           ))}
         </div>
       )}

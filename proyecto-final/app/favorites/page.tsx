@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
-import { DocumentCard } from "@/components/document-card"
+import { DocumentCard } from "@/components/documents/document-card"
 import { Heart } from "lucide-react"
 
 export const metadata = {
