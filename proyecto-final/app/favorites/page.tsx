@@ -1,10 +1,13 @@
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { DocumentCard } from "@/components/documents/document-card"
+import { Button } from "@/components/ui/button"
 import { Heart } from "lucide-react"
+import Link from "next/link"
+import type { Document, Category } from "@/lib/types"
 
 export const metadata = {
-  title: "Mis Favoritos | Biblioteca de Analisis",
+  title: "Mis Favoritos | Biblioteca de Análisis",
 }
 
 export default async function FavoritesPage() {
@@ -27,9 +30,11 @@ export default async function FavoritesPage() {
     .eq("user_id", user.id)
     .order("created_at", { ascending: false })
 
-  const documents = favorites
-    ?.map((f) => f.document)
-    .filter(Boolean) || []
+  type FavDocument = Document & { category: Category | null }
+
+  const documents: FavDocument[] = (favorites || [])
+    .map((f) => f.document)
+    .filter((d): d is FavDocument => d != null)
 
   return (
     <main className="container mx-auto px-4 py-8">
@@ -39,17 +44,20 @@ export default async function FavoritesPage() {
           Mis Favoritos
         </h1>
         <p className="mt-2 text-muted-foreground">
-          Documentos que has guardado para leer mas tarde
+          {documents.length} {documents.length === 1 ? "documento guardado" : "documentos guardados"}
         </p>
       </div>
 
       {documents.length === 0 ? (
-        <div className="py-16 text-center">
+        <div className="flex flex-col items-center justify-center py-24 text-center">
           <Heart className="mx-auto mb-4 h-12 w-12 text-muted-foreground/50" />
-          <h2 className="text-xl font-semibold">No tienes favoritos</h2>
+          <h2 className="text-xl font-semibold">Sin favoritos aún</h2>
           <p className="mt-2 text-muted-foreground">
-            Guarda documentos para acceder a ellos rapidamente
+            Guarda documentos para acceder a ellos rápidamente
           </p>
+          <Button asChild className="mt-6">
+            <Link href="/">Explorar documentos</Link>
+          </Button>
         </div>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { Eye, MessageCircle, Clock, Bookmark } from "lucide-react"
+import { Eye, MessageCircle, Clock, Bookmark, Tag } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -23,6 +23,7 @@ const categoryColors: Record<string, string> = {
   arte: "bg-[oklch(0.55_0.18_330)] dark:bg-[oklch(0.70_0.15_330)]",
   literatura: "bg-[oklch(0.55_0.12_85)] dark:bg-[oklch(0.70_0.10_85)]",
   tecnologia: "bg-[oklch(0.55_0.15_250)] dark:bg-[oklch(0.70_0.12_250)]",
+  psicologia: "bg-[oklch(0.55_0.18_310)] dark:bg-[oklch(0.70_0.15_310)]",
 }
 
 export function DocumentCard({ document, variant = "default" }: DocumentCardProps) {
@@ -150,8 +151,8 @@ export function DocumentCard({ document, variant = "default" }: DocumentCardProp
         </div>
         <CardContent className="p-4">
           {document.category && (
-            <Badge 
-              variant="secondary" 
+            <Badge
+              variant="secondary"
               className={cn("mb-2 text-xs text-white", categoryColor)}
             >
               {document.category.name}
@@ -165,6 +166,24 @@ export function DocumentCard({ document, variant = "default" }: DocumentCardProp
               {document.description}
             </p>
           )}
+
+          {/* Clickable tags */}
+          {document.tags && document.tags.length > 0 && (
+            <div className="mb-3 flex flex-wrap gap-1">
+              {document.tags.slice(0, 3).map((tag) => (
+                <Link
+                  key={tag}
+                  href={`/search?tag=${encodeURIComponent(tag)}`}
+                  onClick={(e) => e.stopPropagation()}
+                  className="inline-flex items-center gap-0.5 rounded-full border border-border/60 px-2 py-0.5 text-[10px] text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary"
+                >
+                  <Tag className="h-2.5 w-2.5" />
+                  {tag}
+                </Link>
+              ))}
+            </div>
+          )}
+
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
             <span className="flex items-center gap-1">
               <Eye className="h-3.5 w-3.5" />

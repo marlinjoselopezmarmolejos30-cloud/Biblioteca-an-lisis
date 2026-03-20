@@ -10,8 +10,6 @@ import {
   Layers,
   Users,
   MessageSquare,
-  Settings,
-  BarChart3,
   ArrowLeft,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -26,8 +24,6 @@ const navigation = [
   { name: "Series", href: "/admin/series", icon: Layers },
   { name: "Comentarios", href: "/admin/comments", icon: MessageSquare },
   { name: "Usuarios", href: "/admin/users", icon: Users },
-  { name: "Estadisticas", href: "/admin/stats", icon: BarChart3 },
-  { name: "Configuracion", href: "/admin/settings", icon: Settings },
 ]
 
 export function AdminSidebar() {
