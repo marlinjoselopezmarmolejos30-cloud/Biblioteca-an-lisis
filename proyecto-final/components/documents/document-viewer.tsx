@@ -44,6 +44,8 @@ export function DocumentViewer({ document, seriesDocuments }: DocumentViewerProp
   const [isFavorite, setIsFavorite] = useState(false)
   const [showComments, setShowComments] = useState(false)
   const [copied, setCopied] = useState(false)
+  const progressSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const lastSavedProgress = useRef(0)
 
   const supabase = createClient()
 
@@ -65,6 +67,27 @@ export function DocumentViewer({ document, seriesDocuments }: DocumentViewerProp
     checkFavorite()
   }, [user, document.id, supabase])
 
+  // Save reading progress to DB (debounced, only if change >= 5%)
+  const saveProgress = useCallback(
+    async (newProgress: number) => {
+      if (!user) return
+      if (Math.abs(newProgress - lastSavedProgress.current) < 5 && newProgress < 99) return
+
+      lastSavedProgress.current = newProgress
+
+      await supabase.from("reading_history").upsert(
+        {
+          user_id: user.id,
+          document_id: document.id,
+          progress: Math.round(newProgress),
+          last_read_at: new Date().toISOString(),
+        },
+        { onConflict: "user_id,document_id" }
+      )
+    },
+    [user, document.id, supabase]
+  )
+
   // Track reading progress
   const handleIframeLoad = useCallback(() => {
     const iframe = iframeRef.current
@@ -77,9 +100,14 @@ export function DocumentViewer({ document, seriesDocuments }: DocumentViewerProp
       const scrollTop = iframeDoc.documentElement.scrollTop || iframeDoc.body.scrollTop
       const scrollHeight = iframeDoc.documentElement.scrollHeight || iframeDoc.body.scrollHeight
       const clientHeight = iframeDoc.documentElement.clientHeight || iframeDoc.body.clientHeight
-      
+
       const scrollProgress = (scrollTop / (scrollHeight - clientHeight)) * 100
-      setProgress(Math.min(100, Math.max(0, scrollProgress)))
+      const clampedProgress = Math.min(100, Math.max(0, scrollProgress))
+      setProgress(clampedProgress)
+
+      // Debounce DB save — write 1.5s after user stops scrolling
+      if (progressSaveTimer.current) clearTimeout(progressSaveTimer.current)
+      progressSaveTimer.current = setTimeout(() => saveProgress(clampedProgress), 1500)
     }
 
     iframe.contentWindow.addEventListener("scroll", updateProgress)
@@ -87,8 +115,9 @@ export function DocumentViewer({ document, seriesDocuments }: DocumentViewerProp
 
     return () => {
       iframe.contentWindow?.removeEventListener("scroll", updateProgress)
+      if (progressSaveTimer.current) clearTimeout(progressSaveTimer.current)
     }
-  }, [])
+  }, [saveProgress])
 
   // Toggle favorite
   const toggleFavorite = async () => {

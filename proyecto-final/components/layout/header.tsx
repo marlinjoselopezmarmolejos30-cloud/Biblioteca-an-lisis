@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useCallback } from "react"
 import { 
   Search, Bell, User, Menu, X, Sun, Moon,
   BookOpen, LogOut, Settings, Heart, Clock
@@ -52,6 +52,23 @@ export function Header() {
       setSearchQuery("")
     }
   }
+
+  // Debounce: auto-navigate 300ms after user stops typing
+  const debouncedSearch = useCallback(
+    (query: string) => {
+      if (query.trim().length >= 2) {
+        router.push(`/search?q=${encodeURIComponent(query.trim())}`)
+      }
+    },
+    [router]
+  )
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      debouncedSearch(searchQuery)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [searchQuery, debouncedSearch])
 
   useEffect(() => {
     if (searchOpen && searchRef.current) {
