@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
-import { Header } from "@/components/header"
-import { DocumentCard } from "@/components/document-card"
+import { Header } from "@/components/layout/header"
+import { DocumentCard } from "@/components/documents/document-card"
 import { notFound } from "next/navigation"
 import type { DocumentWithRelations, Category } from "@/lib/types"
 

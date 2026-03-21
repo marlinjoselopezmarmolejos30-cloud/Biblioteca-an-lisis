@@ -10,17 +10,17 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Bell, FileText, MessageSquare, Heart, AtSign } from "lucide-react"
+import { Bell, FileText, MessageSquare, Heart } from "lucide-react"
 import Link from "next/link"
 import type { Notification } from "@/lib/types"
 import { formatDistanceToNow } from "date-fns"
 import { es } from "date-fns/locale"
 
-const iconMap = {
+const iconMap: Record<string, React.ElementType> = {
   new_document: FileText,
   comment_reply: MessageSquare,
   comment_like: Heart,
-  mention: AtSign,
+  system: Bell,
 }
 
 export function NotificationBell() {
@@ -133,7 +133,7 @@ export function NotificationBell() {
                 return (
                   <Link
                     key={notification.id}
-                    href={notification.link || "#"}
+                    href={notification.document_id ? `/document/${notification.document_id}` : "#"}
                     onClick={() => {
                       if (!notification.is_read) markAsRead(notification.id)
                       setOpen(false)

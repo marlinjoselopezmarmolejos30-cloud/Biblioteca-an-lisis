@@ -37,8 +37,8 @@ export function CommentForm({
 
     if (!user || !content.trim()) return
 
-    if (profile?.is_muted) {
-      toast.error("Tu cuenta esta silenciada y no puedes comentar")
+    if (profile?.is_silenced) {
+      toast.error("Tu cuenta está silenciada y no puedes comentar")
       return
     }
 

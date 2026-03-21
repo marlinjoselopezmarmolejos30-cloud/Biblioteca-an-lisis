@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
-import { Header } from "@/components/header"
+import { Header } from "@/components/layout/header"
 import { Card, CardContent } from "@/components/ui/card"
 import Link from "next/link"
 import type { Category } from "@/lib/types"

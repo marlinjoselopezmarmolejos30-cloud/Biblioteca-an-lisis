@@ -64,16 +64,16 @@ export default function AdminUsersPage() {
     }
   }
 
-  async function toggleBan(id: string, currentlyBanned: boolean) {
+  async function toggleSilence(id: string, currentlySilenced: boolean) {
     const { error } = await supabase
       .from("profiles")
-      .update({ is_banned: !currentlyBanned })
+      .update({ is_silenced: !currentlySilenced })
       .eq("id", id)
 
     if (error) {
       toast.error("Error al actualizar estado")
     } else {
-      toast.success(currentlyBanned ? "Usuario desbaneado" : "Usuario baneado")
+      toast.success(currentlySilenced ? "Usuario activado" : "Usuario silenciado")
       fetchUsers()
     }
   }
@@ -149,8 +149,8 @@ export default function AdminUsersPage() {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      {user.is_banned ? (
-                        <Badge variant="destructive">Baneado</Badge>
+                      {user.is_silenced ? (
+                        <Badge variant="destructive">Silenciado</Badge>
                       ) : (
                         <Badge variant="outline" className="text-green-600 border-green-600">
                           Activo
@@ -179,16 +179,16 @@ export default function AdminUsersPage() {
                               Quitar Admin
                             </DropdownMenuItem>
                           )}
-                          <DropdownMenuItem onClick={() => toggleBan(user.id, user.is_banned || false)}>
-                            {user.is_banned ? (
+                          <DropdownMenuItem onClick={() => toggleSilence(user.id, user.is_silenced || false)}>
+                            {user.is_silenced ? (
                               <>
                                 <CheckCircle className="mr-2 h-4 w-4" />
-                                Desbanear
+                                Activar
                               </>
                             ) : (
                               <>
                                 <Ban className="mr-2 h-4 w-4" />
-                                Banear
+                                Silenciar
                               </>
                             )}
                           </DropdownMenuItem>
