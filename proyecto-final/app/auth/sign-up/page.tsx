@@ -31,8 +31,8 @@ export default function SignUpPage() {
       return
     }
 
-    if (password.length < 6) {
-      toast.error("La contrasena debe tener al menos 6 caracteres")
+    if (password.length < 8) {
+      toast.error("La contrasena debe tener al menos 8 caracteres")
       return
     }
 
@@ -42,8 +42,7 @@ export default function SignUpPage() {
       email,
       password,
       options: {
-        emailRedirectTo: process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL ||
-          `${window.location.origin}/auth/callback`,
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
         data: {
           display_name: displayName,
         },

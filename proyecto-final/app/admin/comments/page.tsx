@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
 import { Spinner } from "@/components/ui/spinner"
-import { Search, MoreHorizontal, Eye, Trash2, Star, StarOff, EyeOff } from "lucide-react"
+import { Search, MoreHorizontal, Eye, Trash2, Star, StarOff } from "lucide-react"
 import { toast } from "sonner"
 import Link from "next/link"
 

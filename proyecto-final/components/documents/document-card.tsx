@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Eye, MessageCircle, Clock, Bookmark, Tag } from "lucide-react"
@@ -8,10 +9,12 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import type { Document, Category } from "@/lib/types"
 import { cn } from "@/lib/utils"
+import { toast } from "sonner"
 
 interface DocumentCardProps {
   document: Document & { category?: Category | null }
   variant?: "default" | "compact" | "featured"
+  initialFavorited?: boolean
 }
 
 const categoryColors: Record<string, string> = {
@@ -26,9 +29,38 @@ const categoryColors: Record<string, string> = {
   psicologia: "bg-[oklch(0.55_0.18_310)] dark:bg-[oklch(0.70_0.15_310)]",
 }
 
-export function DocumentCard({ document, variant = "default" }: DocumentCardProps) {
+export function DocumentCard({ document, variant = "default", initialFavorited = false }: DocumentCardProps) {
   const categorySlug = document.category?.slug || "default"
   const categoryColor = categoryColors[categorySlug] || "bg-primary"
+  const [favorited, setFavorited] = useState(initialFavorited)
+  const [favLoading, setFavLoading] = useState(false)
+
+  const handleFavorite = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    if (favLoading) return
+    setFavLoading(true)
+    const next = !favorited
+    setFavorited(next) // optimistic
+    try {
+      const res = await fetch("/api/favorites", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ document_id: document.id }),
+      })
+      if (res.status === 401) {
+        setFavorited(!next)
+        toast.error("Inicia sesión para guardar favoritos")
+        return
+      }
+      if (!res.ok) throw new Error()
+      toast.success(next ? "Guardado en favoritos" : "Eliminado de favoritos")
+    } catch {
+      setFavorited(!next) // revert
+      toast.error("Error al actualizar favoritos")
+    } finally {
+      setFavLoading(false)
+    }
+  }
 
   if (variant === "featured") {
     return (
@@ -140,13 +172,20 @@ export function DocumentCard({ document, variant = "default" }: DocumentCardProp
           <Button
             variant="ghost"
             size="icon"
-            className="absolute right-2 top-2 h-8 w-8 bg-black/20 text-white opacity-0 backdrop-blur-sm transition-opacity hover:bg-black/40 group-hover:opacity-100"
-            onClick={(e) => {
-              e.preventDefault()
-              // TODO: Add to favorites
-            }}
+            className={cn(
+              "absolute right-2 top-2 h-8 w-8 backdrop-blur-sm transition-all",
+              "bg-black/20 text-white hover:bg-black/40",
+              favorited
+                ? "opacity-100"
+                : "opacity-0 group-hover:opacity-100"
+            )}
+            onClick={handleFavorite}
+            disabled={favLoading}
+            aria-label={favorited ? "Quitar de favoritos" : "Guardar en favoritos"}
           >
-            <Bookmark className="h-4 w-4" />
+            <Bookmark
+              className={cn("h-4 w-4 transition-all", favorited && "fill-white")}
+            />
           </Button>
         </div>
         <CardContent className="p-4">
